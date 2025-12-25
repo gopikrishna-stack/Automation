@@ -59,15 +59,19 @@ jobs:
       # --------------------
       # ZAP DAST Report
       # --------------------
-      - name: ZAP Baseline Scan (HTML report)
-        uses: zaproxy/action-baseline@v0.10.0
-        continue-on-error: true
-        with:
-          target: "http://localhost:5000"
-          cmd_options: "-r zap-report.html"
+- name: Wait for application to be ready
+  run: sleep 15
 
-      - name: Upload ZAP Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: zap-report
-          path: zap-report.html
+- name: ZAP Baseline Scan (HTML report)
+  uses: zaproxy/action-baseline@v0.10.0
+  continue-on-error: true
+  with:
+    target: "http://localhost:5000"
+    cmd_options: "-r zap-report.html"
+
+- name: Upload ZAP Report
+  uses: actions/upload-artifact@v4
+  continue-on-error: true
+  with:
+    name: zap-report
+    path: zap-report.html
