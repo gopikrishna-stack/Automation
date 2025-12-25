@@ -14,20 +14,29 @@ jobs:
       # --------------------
       # Semgrep SAST Report
       # --------------------
-      - name: Run Semgrep (Block on High/Critical)
-  run: |
-    pip install semgrep
-    semgrep \
-      --config p/owasp-top-ten \
-      --severity ERROR \
-      --severity WARNING \
-      --sarif \
-      --output semgrep.sarif .
-    - name: Upload Semgrep Report
-    uses: actions/upload-artifact@v4
-    with:
-    name: semgrep-report
-    path: semgrep.sarif
+          # --------------------
+      # Semgrep SAST (Block on High / Critical)
+      # --------------------
+
+      - name: Install Semgrep
+        run: pip install semgrep
+
+      - name: Run Semgrep and generate SARIF
+        run: |
+          semgrep \
+            --config p/owasp-top-ten \
+            --severity ERROR \
+            --severity WARNING \
+            --sarif \
+            --output semgrep.sarif .
+        continue-on-error: false
+
+      - name: Upload Semgrep Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: semgrep-report
+          path: semgrep.sarif
+
       # --------------------
       # Build Docker Image
       # --------------------
