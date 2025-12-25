@@ -51,14 +51,11 @@ jobs:
           path: trivy-report.json
 
       # --------------------
-      # Run App
+      # ZAP DAST Report
       # --------------------
       - name: Run Application Container
         run: docker run -d -p 5000:5000 devsecops-app
-
-      # --------------------
-      # ZAP DAST Report
-      # --------------------
+        
 - name: Wait for application to be ready
   run: sleep 15
 
