@@ -1,4 +1,4 @@
-name: Automation
+name: DevSecOps Beginner Pipeline with Reports
 
 on:
   push:
@@ -11,45 +11,63 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
 
-   - name: Run Semgrep and generate report
-  run: |
-    pip install semgrep
-    semgrep --config p/owasp-top-ten --sarif --output semgrep.sarif .
-  continue-on-error: true
+      # --------------------
+      # Semgrep SAST Report
+      # --------------------
+      - name: Install Semgrep
+        run: pip install semgrep
 
-- name: Upload Semgrep Report
-  uses: actions/upload-artifact@v3
-  with:
-    name: semgrep-report
-    path: semgrep.sarif
+      - name: Run Semgrep and generate SARIF report
+        run: semgrep --config p/owasp-top-ten --sarif --output semgrep.sarif .
+        continue-on-error: true
 
+      - name: Upload Semgrep Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: semgrep-report
+          path: semgrep.sarif
+
+      # --------------------
+      # Build Docker Image
+      # --------------------
       - name: Build Docker Image
         run: docker build -t devsecops-app .
 
-      -- name: Trivy Image Scan
-  uses: aquasecurity/trivy-action@master
-  continue-on-error: true
-  with:
-    image-ref: devsecops-app
-    format: json
-    output: trivy-report.json
-- name: Upload Trivy Report
-  uses: actions/upload-artifact@v3
-  with:
-    name: trivy-report
-    path: trivy-report.json
+      # --------------------
+      # Trivy Image Report
+      # --------------------
+      - name: Trivy Image Scan (JSON report)
+        uses: aquasecurity/trivy-action@master
+        continue-on-error: true
+        with:
+          image-ref: devsecops-app
+          format: json
+          output: trivy-report.json
 
-      - name: Run Application
+      - name: Upload Trivy Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: trivy-report
+          path: trivy-report.json
+
+      # --------------------
+      # Run App
+      # --------------------
+      - name: Run Application Container
         run: docker run -d -p 5000:5000 devsecops-app
 
-      - - name: ZAP Baseline Scan
-  uses: zaproxy/action-baseline@v0.10.0
-  continue-on-error: true
-  with:
-    target: "http://localhost:5000"
-    cmd_options: "-r zap-report.html"
-- name: Upload ZAP Report
-  uses: actions/upload-artifact@v3
-  with:
-    name: zap-report
-    path: zap-report.html
+      # --------------------
+      # ZAP DAST Report
+      # --------------------
+      - name: ZAP Baseline Scan (HTML report)
+        uses: zaproxy/action-baseline@v0.10.0
+        continue-on-error: true
+        with:
+          target: "http://localhost:5000"
+          cmd_options: "-r zap-report.html"
+
+      - name: Upload ZAP Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: zap-report
+          path: zap-report.html
