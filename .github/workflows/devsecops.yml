@@ -14,18 +14,20 @@ jobs:
       # --------------------
       # Semgrep SAST Report
       # --------------------
-      - name: Install Semgrep
-        run: pip install semgrep
-
-      - name: Run Semgrep and generate SARIF report
-        run: semgrep --config p/owasp-top-ten --sarif --output semgrep.sarif .
-        continue-on-error: true
-
-      - name: Upload Semgrep Report
-        uses: actions/upload-artifact@v4
-        with:
-          name: semgrep-report
-          path: semgrep.sarif
+      - name: Run Semgrep (Block on High/Critical)
+  run: |
+    pip install semgrep
+    semgrep \
+      --config p/owasp-top-ten \
+      --severity ERROR \
+      --severity WARNING \
+      --sarif \
+      --output semgrep.sarif .
+    - name: Upload Semgrep Report
+  uses: actions/upload-artifact@v4
+  with:
+    name: semgrep-report
+    path: semgrep.sarif
 
       # --------------------
       # Build Docker Image
@@ -36,13 +38,14 @@ jobs:
       # --------------------
       # Trivy Image Report
       # --------------------
-      - name: Trivy Image Scan (JSON report)
-        uses: aquasecurity/trivy-action@master
-        continue-on-error: true
-        with:
-          image-ref: devsecops-app
-          format: json
-          output: trivy-report.json
+     - name: Trivy Image Scan (Block on High/Critical)
+  uses: aquasecurity/trivy-action@master
+  with:
+    image-ref: devsecops-app
+    severity: HIGH,CRITICAL
+    exit-code: "1"
+    format: json
+    output: trivy-report.json
 
       - name: Upload Trivy Report
         uses: actions/upload-artifact@v4
