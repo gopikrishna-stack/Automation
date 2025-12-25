@@ -17,7 +17,6 @@ jobs:
   with:
     config: p/owasp-top-ten
     generateSarif: true
-
 - name: Upload Semgrep Report
   uses: actions/upload-artifact@v3
   with:
@@ -34,7 +33,6 @@ jobs:
     image-ref: devsecops-app
     format: json
     output: trivy-report.json
-
 - name: Upload Trivy Report
   uses: actions/upload-artifact@v3
   with:
@@ -50,7 +48,6 @@ jobs:
   with:
     target: "http://localhost:5000"
     cmd_options: "-r zap-report.html"
-
 - name: Upload ZAP Report
   uses: actions/upload-artifact@v3
   with:
