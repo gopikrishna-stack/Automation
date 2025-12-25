@@ -24,11 +24,10 @@ jobs:
       --sarif \
       --output semgrep.sarif .
     - name: Upload Semgrep Report
-  uses: actions/upload-artifact@v4
-  with:
-  name: semgrep-report
+    uses: actions/upload-artifact@v4
+    with:
+    name: semgrep-report
     path: semgrep.sarif
-
       # --------------------
       # Build Docker Image
       # --------------------
@@ -48,7 +47,7 @@ jobs:
     output: trivy-report.json
 
       - name: Upload Trivy Report
-        uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v4
         with:
           name: trivy-report
           path: trivy-report.json
