@@ -55,9 +55,8 @@ jobs:
       # --------------------
       - name: Run Application Container
         run: docker run -d -p 5000:5000 devsecops-app
-        
-- name: Wait for application to be ready
-  run: sleep 15
+        - name: Wait for application to be ready
+          run: sleep 15
 
 - name: ZAP Baseline Scan (HTML report)
   uses: zaproxy/action-baseline@v0.10.0
